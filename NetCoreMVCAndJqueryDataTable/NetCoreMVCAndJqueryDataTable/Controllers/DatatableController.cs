@@ -116,9 +116,9 @@ namespace NetCoreMVCAndJqueryDataTable.Controllers
                 },
                 new CustomerViewModel()
                 {
-                    Id = 2,
+                    Id = 3,
                     Name = "Tri",
-                    City = "Ho chi minh",
+                    City = "Dong thap",
                     District = "Go vap",
                     Ward = "F 3",
                     Address = "Nguyen Kiem"
@@ -127,8 +127,8 @@ namespace NetCoreMVCAndJqueryDataTable.Controllers
                 {
                     Id = 2,
                     Name = "Tung",
-                    City = "Ho chi minh",
-                    District = "Go vap",
+                    City = "Vinh long",
+                    District = "Nam tri",
                     Ward = "F 3",
                     Address = "Nguyen Kiem"
                 },
@@ -136,8 +136,8 @@ namespace NetCoreMVCAndJqueryDataTable.Controllers
                 {
                     Id = 2,
                     Name = "Quang",
-                    City = "Ho chi minh",
-                    District = "Go vap",
+                    City = "Ha noi",
+                    District = "Hang ma",
                     Ward = "F 3",
                     Address = "Nguyen Kiem"
                 }
@@ -195,10 +195,17 @@ namespace NetCoreMVCAndJqueryDataTable.Controllers
                 if (request.search != null && !string.IsNullOrWhiteSpace(request.search.Value))
                 {
                     string searchValue = request.search.Value.ToLower();
-                    _list = this.listCustomer.Where(m => m.Name.ToLower().Contains(searchValue)).ToList();
+                    _list = this.listCustomer.Where(m => m.Name.ToLower().Contains(searchValue) 
+                                                   || m.Address.ToLower().Contains(searchValue)
+                                                   || m.City.ToLower().Contains(searchValue)
+                                                   || m.District.ToLower().Contains(searchValue)
+                                                   || m.Ward.ToLower().Contains(searchValue)).ToList();
+                }
+                else
+                {
+                    _list = this.listCustomer;
                 }
 
-                _list = this.listCustomer;
 
                 _itemResponse.recordsFiltered = _list.Count;
                 IOrderedEnumerable<CustomerViewModel> _sortList = null;
