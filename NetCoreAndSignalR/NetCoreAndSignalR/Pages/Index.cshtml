@@ -1,0 +1,77 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="container">
+    <div class="row">&nbsp;</div>
+    <div class="row">
+        <div class="col-6">&nbsp;</div>
+        <div class="col-6">
+            User..........<input type="text" id="userInput" />
+            <br />
+            Message...<input type="text" id="messageInput" />
+            <input type="button" id="sendButton" value="Send Message" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">&nbsp;</div>
+        <div class="col-6">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+</div>
+
+<div>
+    <p>1. Install signalr package</p>
+    <p>
+        Microsoft.AspNet.SignalR
+    </p>
+    <p>1. Create hubs folder and class ChatHub.cs</p>
+    <p>
+        <pre>
+
+        </pre>
+    </p>
+    <p>2. Config middleware in startup.cs</p>
+    <p>
+
+    </p>
+    <p></p>
+    <p>
+
+    </p>
+    <p></p>
+    <p>
+
+    </p>
+    <p></p>
+    <p>
+
+    </p>
+    <p></p>
+    <p>
+
+    </p>
+    <p></p>
+    <p>
+
+    </p>
+    <p></p>
+    <p>
+
+    </p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aspnet-signalr/1.1.4/signalr.min.js"></script>
+<script src="~/js/chat.js"></script>
