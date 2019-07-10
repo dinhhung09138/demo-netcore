@@ -1,0 +1,127 @@
+﻿@page
+@model NetCoreRazorPageAndJqueryDataTable.Pages.Customer.IndexModel
+@{
+    ViewData["Title"] = "List of customer";
+}
+<h2>List of customer</h2>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css" />
+
+<table id="example" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>District</th>
+            <th>Ward</th>
+            <th>Address</th>
+        </tr>
+    </thead>
+</table>
+@section Scripts{
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
+    <script>
+
+        var language = {
+            lengthMenu: 'Hiển thị _MENU_',
+            zeroRecords: 'Dữ liệu không tồn tại',
+            info: 'Trang _PAGE_/_PAGES_',
+            infoEmpty: 'Không tìm thấy kết quả',
+            infoFiltered: '(Tìm kiếm trên _MAX_ dòng)',
+            search: 'Tìm kiếm',
+            processing: 'Đang xử lý',
+            paginate: {
+                first: '<<',
+                previous: '<',
+                next: '>',
+                last: '>>'
+            }
+        };
+        /**
+         * l: length changing input control
+         * f: filtering input
+         * t: The table
+         * i: Table informatin summary
+         * p: pagination control
+         * r: Processing display element
+         * < and > - div element
+         * <"class" and > - div with a class
+         * <"#id" and > - div with an ID
+         * <"#id.class" and > - div with an ID and a class
+         * https://datatables.net/reference/option/dom
+         */
+        var dom = '<"top"<"row"<"col-md-3 col-sm-4 col-xs-12"l><"col-md-6 col-sm-4 col-xs-12"<"toolbar">><"col-md-3 col-sm-4 col-xs-12 text-right"f>>>rt<"bottom"<"row"<"col-md-5 col-sm-6 col-xs-12"i><"col-md-7 col-sm-6 col-xs-12"p>>><"clear">';
+
+
+        table = $('#example').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            paging: true,
+            responsive: true,
+            pageLength: 10,
+            pagingType: 'full_numbers',
+            dom: dom,
+            info: true,
+            autoWidth: false,
+            initComplete: function (settings, json) {
+                //Do something after finish
+            },
+            createRow: function (row, data, dataIndex) {
+
+            },
+            language: language,
+            order: [[2, "asc"]],
+            ajax: {
+                url: '/api/customer/index',
+                type: 'post',
+                data: function (d) {
+
+                }
+            },
+            columns: [
+                {
+                    orderable: false,
+                    width: '40px',
+                    className: 'ctn-center',
+                    render: function (obj, type, data, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    data: 'id',
+                    orderable: true,
+                    searchable: true,
+                    width: '150px'
+                },
+                {
+                    data: 'name',
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: 'city',
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: 'district',
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: 'ward',
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: 'address',
+                    orderable: true,
+                    searchable: true
+                }
+            ]
+        });
+    </script>
+}
