@@ -30,14 +30,13 @@ namespace LoginAuthentication
             services.AddDbContext<DataContext>(x => x.UseInMemoryDatabase("TestDb"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddAutoMapper();
 
-            //var mappingConfig = new MapperConfiguration(mc =>
-            //{
-            //    mc.AddProfile(new AutoMapperProfile());
-            //});
-            //IMapper mapper = mappingConfig.CreateMapper();
-            //services.AddSingleton(mapper);
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new AutoMapperProfile());
+            });
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
 
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -62,6 +61,7 @@ namespace LoginAuthentication
                         var user = userService.GetById(userId);
                         if (user == null)
                         {
+                            context.Response.Body.Write(Encoding.ASCII.GetBytes("Error here"));
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
                         }

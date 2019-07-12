@@ -9,10 +9,10 @@ namespace LoginAuthentication.Services
 {
     public interface IUserService
     {
-        User Authenticate(string username, string password);
-        IEnumerable<User> GetAll();
-        User GetById(int id);
-        User Create(User user, string password);
+        Task<User> Authenticate(string username, string password);
+        Task<IEnumerable<User>> GetAll();
+        Task<User> GetById(int id);
+        Task<User> Create(User user, string password);
         void Update(User user, string password = null);
         void Delete(int id);
     }
@@ -26,12 +26,13 @@ namespace LoginAuthentication.Services
             _context = context;
         }
 
-        public User Authenticate(string username, string password)
+        public async Task<User> Authenticate(string username, string password)
         {
+            await Task.Delay(0);
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _context.Users.SingleOrDefault(x => x.Username == username);
+            var user = _context.Users.FirstOrDefault(x => x.Username == username);
 
             // check if username exists
             if (user == null)
@@ -45,17 +46,19 @@ namespace LoginAuthentication.Services
             return user;
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<IEnumerable<User>> GetAll()
         {
+            await Task.Delay(0);
             return _context.Users;
         }
 
-        public User GetById(int id)
+        public async Task<User> GetById(int id)
         {
+            await Task.Delay(0);
             return _context.Users.Find(id);
         }
 
-        public User Create(User user, string password)
+        public async Task<User> Create(User user, string password)
         {
             // validation
             if (string.IsNullOrWhiteSpace(password))
@@ -71,7 +74,7 @@ namespace LoginAuthentication.Services
             user.PasswordSalt = passwordSalt;
 
             _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return user;
         }

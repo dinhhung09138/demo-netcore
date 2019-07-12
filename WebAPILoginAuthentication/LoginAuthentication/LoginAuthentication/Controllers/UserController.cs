@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using LoginAuthentication.Entities;
 using LoginAuthentication.Helpers;
 using LoginAuthentication.Models;
 using LoginAuthentication.Services;
@@ -17,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace LoginAuthentication.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -33,21 +35,17 @@ namespace LoginAuthentication.Controllers
             this._appSettings = appSetting.Value;
         }
 
-        // GET api/values
-        [HttpGet]
-        [Route("getitem")]
-        public ActionResult<IEnumerable<string>> Get()
+        [AllowAnonymous]    
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> Authenticate([FromBody]UserModel model)
         {
-            UserModel model = new UserModel() { Id = 1, FirstName = "nam", LastName = "nad", Password = "`1", Username = "aj" };
-            var user = _userService.Authenticate(model.FirstName, model.Password);
+            var user = await _userService.Authenticate(model.Username, model.Password);
+
             if (user == null)
-            {
                 return BadRequest(new { message = "Username or password is incorrect" });
-            }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -69,42 +67,80 @@ namespace LoginAuthentication.Controllers
                 LastName = user.LastName,
                 Token = tokenString
             });
-
-            return new string[] { "value1", "value2" };
         }
 
         [AllowAnonymous]
-        [HttpGet("authenticate")]
-        public IActionResult Authenticate([FromBody]UserModel userDto)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody]UserModel model)
         {
-            var user = _userService.Authenticate(userDto.Username, userDto.Password);
+            // map dto to entity
+            var user = _mapper.Map<User>(model);
 
-            if (user == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-
-            // return basic user info (without password) and token to store client side
-            return Ok(new
+                // save 
+                await _userService.Create(user, model.Password);
+                return Ok(new { message = "User created" });
+            }
+            catch (AppException ex)
             {
-                Id = user.Id,
-                Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Token = tokenString
-            });
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        //[AllowAnonymous]
+        [HttpGet("getall")]
+        public async Task<IActionResult> GetAll()
+        {
+            var users = await _userService.GetAll();
+            var userModels = _mapper.Map<List<UserModel>>(users);
+
+            return Ok(userModels);
+        }
+
+        //[AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var user = await _userService.GetById(id);
+            var userDto = _mapper.Map<UserModel>(user);
+            return Ok(userDto);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody]UserModel userDto)
+        {
+            // map dto to entity and set id
+            var user = _mapper.Map<User>(userDto);
+            user.Id = id;
+
+            try
+            {
+                // save 
+                _userService.Update(user, userDto.Password);
+                return Ok(new { message = "User updated" });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                _userService.Delete(id);
+                return Ok(new { message = "User deleted" });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            
         }
     }
 }
